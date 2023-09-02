@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { usePathname, useRouter } from "next/navigation"
 import { MemoryValidation } from "@/lib/validations/memory"
 import { createMemory } from '@/lib/actions/memory.actions'
+import { useOrganization } from '@clerk/nextjs'
 
 interface Props {
     userId: string;
@@ -24,6 +25,7 @@ interface Props {
 function PostMemory({ userId }: Props) {
     const router = useRouter();
     const pathname  = usePathname();
+    const { organization } = useOrganization();
 
     const form = useForm<z.infer<typeof MemoryValidation>>({
         resolver: zodResolver(MemoryValidation),
@@ -37,7 +39,7 @@ function PostMemory({ userId }: Props) {
         await createMemory({
             text: values.memory,
             author: userId,
-            communityId: null,
+            communityId: organization ? organization.id : null,
             path: pathname
         });
 
